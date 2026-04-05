@@ -1,6 +1,7 @@
 update-vms.sh - Automated Linux VM Patching
 
 Overview----------------
+
 Bash script for automated patch management across multiple Linux VMs with logging, error handling, and sequential updates.
 
 Features----------------
