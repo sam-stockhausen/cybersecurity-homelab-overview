@@ -1,41 +1,47 @@
-eyespy.py - Network Device Discovery Scanner
+# eyespy.py — Network Device Discovery Scanner
 
-Overview
-Automated network scanner that discovers devices across multiple VLANs, tracks baseline inventory, and alerts on new or unauthorized devices.
+Automated network scanner that discovers devices across multiple network segments, tracks a baseline inventory, and alerts on new or unauthorized devices.
 
-Features
-- Multi-VLAN scanning (SERVERS, CLIENTS)
+---
+
+## Features
+
+- Multi-subnet scanning across configurable network ranges
 - Device fingerprinting (IP, MAC, hostname, open ports)
 - Baseline comparison for change detection
 - JSON persistent storage
 - New device alerting
 
-Technical Implementation
+---
 
-Technologies
-- Python 3: Core language
-- nmap: Network scanning engine
-- XML parsing: Processing nmap output
-- JSON: Data persistence
+## Technical Implementation
 
-Architecture
-1. Load previous baseline (JSON file)
-2. Scan configured networks (nmap -F)
-3. Parse XML output → extract device data
-4. Compare current vs baseline
-5. Alert on new devices
+**Technologies**
+- Python 3 — core language
+- nmap — network scanning engine
+- xml.etree.ElementTree — parsing nmap output
+- json — data persistence
+
+**Architecture**
+1. Load previous baseline from JSON file
+2. Scan configured networks using nmap
+3. Parse XML output and extract device data
+4. Compare current scan vs baseline
+5. Alert on new or changed devices
 6. Save updated baseline
 
-Key Code Patterns
+---
 
-XML Parsing:
+## Key Code Patterns
+
+**XML Parsing:**
 ```python
 root = ET.fromstring(nmap_output)
 for host in root.findall('host'):
     # Extract IP, MAC, hostname, ports
 ```
 
-Device Dictionary:
+**Device Dictionary:**
 ```python
 devices[ip] = {
     'mac': mac_address,
@@ -46,34 +52,61 @@ devices[ip] = {
 }
 ```
 
-Usage
+---
+
+## Configuration
+
+Edit the `NETWORKS` list at the top of the script to match your environment:
+
+```python
+NETWORKS = [
+    "10.0.20.0/24",   # Example: servers subnet
+    "10.0.30.0/24",   # Example: clients subnet
+]
+```
+
+Baseline file location is also configurable:
+
+```python
+BASELINE_FILE = os.path.expanduser("~/eyespy/baseline_devices.json")
+```
+
+---
+
+## Usage
+
 ```bash
 sudo python3 eyespy.py
 ```
 
-First run: Establishes baseline
-Subsequent runs: Compares and alerts on changes
+- **First run:** Establishes a device baseline
+- **Subsequent runs:** Compares against baseline and alerts on new devices
 
-Configuration
+---
 
-Edit `NETWORKS` list in script:
-```python
-NETWORKS = [
-    "192.168.20.0/24",  # SERVERS
-    "192.168.30.0/24",  # CLIENTS
-]
+## Output Example
+
+```
+Scanning 10.0.20.0/24...
+Scanning 10.0.30.0/24...
+
+NEW DEVICES DETECTED!
+  IP:         10.0.20.110
+  MAC:        AA:BB:CC:DD:EE:FF
+  Hostname:   unknown-device
+  Open Ports: [22, 445]
+
+Baseline saved to ~/eyespy/baseline_devices.json
+Scan complete! Found 7 devices.
 ```
 
-Baseline location: `~/eyespy/baseline_devices.json`
+---
 
+## Requirements
 
-Output Example:
-Scanning 192.168.20.0/24...
-Scanning 192.168.30.0/24...
-NEW DEVICES DETECTED!
-IP: 192.168.20.110
-MAC: AA:BB:CC:DD:EE:FF
-Hostname: unknown-device
-Open Ports: [22, 445]
-Baseline saved to /home/admin/eyespy/baseline_devices.json
-Scan complete! Found 7 devices.
+```bash
+pip install python-nmap
+sudo apt install nmap   # or brew install nmap on macOS
+```
+
+nmap must be run with sudo/root privileges for MAC address resolution.
