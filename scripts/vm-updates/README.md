@@ -1,120 +1,136 @@
-update-vms.sh - Automated Linux VM Patching
-
-Overview----------------
+# update-vms.sh — Automated Linux VM Patching
 
 Bash script for automated patch management across multiple Linux VMs with logging, error handling, and sequential updates.
 
-Features----------------
-- Passwordless SSH (key-based authentication)
-- Sequential VM updates (fail-safe)
+---
+
+## Features
+
+- Passwordless SSH via key-based authentication
+- Sequential VM updates with per-host error handling
 - Comprehensive logging with timestamps
-- Non-interactive mode (no prompts)
-- Success/failure tracking per VM
+- Non-interactive mode for unattended execution
+- Success/failure summary report
 
-Technical Implementation
+---
 
-Technologies-------------
+## Technical Implementation
 
-- Bash: Shell scripting
+**Technologies**
+- Bash — shell scripting
+- SSH — remote command execution
+- APT — Debian/Ubuntu package management
 
-- SSH: Remote execution
+**Architecture**
+1. Update the local management VM first
+2. Loop through each remote VM in the configured list
+3. SSH to host, run apt update + upgrade
+4. Log output and track success/failure per host
+5. Generate a summary report at completion
 
-- APT: Package management
+---
 
-Architecture--------------
-1. Update local management VM
-2. Loop through remote VMs:
+## Configuration
 
-    -SSH to VM
+Edit the `VMS` array at the top of the script. Each entry follows the format `"hostname:ip:username"`:
 
-   -Run apt update && upgrade
-
-    -Log output
-
-    -Track success/failure
-   
-4. Generate summary report
-
-Key Patterns---------------
-
-VM Configuration Array:
 ```bash
 VMS=(
-    "monitoring:192.168.20.30:admin"
-    "pihole:192.168.20.50:root"
+    "monitoring:10.0.20.30:admin"
+    "pihole:10.0.20.50:admin"
 )
 ```
 
-String Parsing:
+Change the log file location if needed:
+
+```bash
+LOG_FILE="$HOME/scripts/logs/vm-updates.log"
+```
+
+---
+
+## Key Patterns
+
+**VM Configuration Array:**
+```bash
+VMS=(
+    "hostname:ip_address:username"
+)
+```
+
+**String Parsing:**
 ```bash
 IFS=':' read -r hostname ip user <<< "$vm_info"
 ```
 
-Non-Interactive Updates:
+**Non-Interactive Updates:**
 ```bash
 DEBIAN_FRONTEND=noninteractive apt upgrade -y \
     -o Dpkg::Options::="--force-confold"
 ```
 
-Prerequisites----------------
+---
 
-SSH Key Setup
+## Prerequisites
+
+**SSH Key Setup**
+
+Generate a key pair on your management host and copy the public key to each target VM:
+
 ```bash
-# Generate key
-ssh-keygen -t ed25519
-
-# Copy to each VM
-ssh-copy-id admin@192.168.20.30
-ssh-copy-id root@192.168.20.50
+ssh-keygen -t ed25519 -C "vm-updater"
+ssh-copy-id user@<vm-ip>
 ```
 
-Sudo Configuration (Optional)
-For completely unattended execution:
+**Optional: Passwordless sudo for APT**
+
+For fully unattended execution without a password prompt:
+
 ```bash
 # /etc/sudoers.d/apt-nopasswd
-admin ALL=(ALL) NOPASSWD: /usr/bin/apt update, /usr/bin/apt upgrade
+your-user ALL=(ALL) NOPASSWD: /usr/bin/apt update, /usr/bin/apt upgrade
 ```
 
-Usage------------------
+---
+
+## Usage
+
 ```bash
+chmod +x update-vms.sh
 ~/scripts/update-vms.sh
 ```
 
-Logs: `~/scripts/logs/vm-updates.log`
+Logs are written to `~/scripts/logs/vm-updates.log` by default.
 
-Output Example
+---
 
+## Output Example
+
+```
 ========================================
-
 VM Update Started: Mon Mar 10 14:30:00 PST 2026
-
-Updating local machine (ubuntu-mgt)...
-
-ubuntu-mgt: SUCCESS
-
-Updating monitoring (192.168.20.30)...
-
-monitoring: SUCCESS
-
-Updating pihole (192.168.20.50)...
-
-pihole: SUCCESS
-
+Updating local machine...
+  local: SUCCESS
+Updating monitoring...
+  monitoring: SUCCESS
+Updating pihole...
+  pihole: SUCCESS
 ========================================
-
 VM Update Completed: Mon Mar 10 14:45:23 PST 2026
+Results: 3 succeeded, 0 failed
+```
 
-Configuration---------------
+---
 
-Add/Remove VMs:
-Edit `VMS` array:
+## Adding or Removing VMs
+
+Edit the `VMS` array — one entry per VM:
+
 ```bash
 VMS=(
-    "hostname:ip:username"
+    "hostname1:ip_address:username"
+    "hostname2:ip_address:username"
 )
 ```
 
-Change Log Location:
-```bash
-LOG_FILE="/var/log/vm-updates.log"
-```
+Remove an entry to exclude a VM from patching.
