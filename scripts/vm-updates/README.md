@@ -13,18 +13,26 @@ Features----------------
 Technical Implementation
 
 Technologies-------------
+
 - Bash: Shell scripting
+
 - SSH: Remote execution
+
 - APT: Package management
 
 Architecture--------------
 1. Update local management VM
 2. Loop through remote VMs:
+
     -SSH to VM
-    -Run apt update && upgrade
+
+   -Run apt update && upgrade
+
     -Log output
+
     -Track success/failure
-3. Generate summary report
+   
+4. Generate summary report
 
 Key Patterns---------------
 
@@ -49,7 +57,7 @@ DEBIAN_FRONTEND=noninteractive apt upgrade -y \
 
 Prerequisites----------------
 
-#SSH Key Setup
+SSH Key Setup
 ```bash
 # Generate key
 ssh-keygen -t ed25519
@@ -74,15 +82,25 @@ Usage------------------
 Logs: `~/scripts/logs/vm-updates.log`
 
 Output Example
+
 ========================================
+
 VM Update Started: Mon Mar 10 14:30:00 PST 2026
+
 Updating local machine (ubuntu-mgt)...
+
 ubuntu-mgt: SUCCESS
+
 Updating monitoring (192.168.20.30)...
+
 monitoring: SUCCESS
+
 Updating pihole (192.168.20.50)...
+
 pihole: SUCCESS
+
 ========================================
+
 VM Update Completed: Mon Mar 10 14:45:23 PST 2026
 
 Configuration---------------
