@@ -1,12 +1,12 @@
-#Overview
+# Overview
 
 Designed and implemented a 4-tier VLAN architecture using pfSense and Proxmox to create isolated network segments that mirror enterprise security zone design. Each VLAN enforces explicit access controls with default-deny between segments.
 
-##Architecture
+## Architecture
 
 VLANNamePurpose10ManagementReserved for future management hosts20ServersInternal services and infrastructure30ClientsEnd-user workstations99DMZReserved for future public-facing services
 
-##Implementation
+## Implementation
 
 **Proxmox**
 
@@ -35,7 +35,7 @@ DMZ: isolated, no inbound access from internal VLANs
 All inter-VLAN traffic is statefully inspected
 
 
-##Key Concepts Demonstrated
+## Key Concepts Demonstrated
 
 Network segmentation and security zone design
 
@@ -48,7 +48,7 @@ DHCP scope management per segment
 Defense-in-depth through isolation
 
 
-##Challenges
+## Challenges
 
 Configuring the VLAN-aware bridge in Proxmox without losing host connectivity during setup
 
@@ -57,7 +57,7 @@ Ordering pfSense firewall rules correctly (rules are evaluated top-down)
 Ensuring DHCP was only serving the correct segment on each interface
 
 
-Tools & Technologies
+## Tools & Technologies
 
 Proxmox VE 8.x
 pfSense 2.7.x (FreeBSD)
