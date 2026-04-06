@@ -1,6 +1,4 @@
-# 08 — Jumpbox / Bastion Host
-
-## Overview
+# Overview
 
 Implemented a jumpbox (bastion host) architecture using the Ubuntu management VM as a single, hardened SSH gateway into the homelab. No production VMs accept direct SSH connections from outside their VLAN — all access is proxied through the jumpbox, creating a controlled chokepoint for privileged access.
 
