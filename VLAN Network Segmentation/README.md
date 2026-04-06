@@ -4,7 +4,15 @@ Designed and implemented a 4-tier VLAN architecture using pfSense and Proxmox to
 
 ## Architecture
 
-VLANNamePurpose10ManagementReserved for future management hosts20ServersInternal services and infrastructure30ClientsEnd-user workstations99DMZReserved for future public-facing services
+| VLAN | Name       |        Purpose         |
+|10| MGMT | Reserved for future management hosts |
+|20| SERVERS | Internal services and infrastructure |
+|30| CLIENTS | End-user workstations |
+|99| DMZ | Reserved for future public-facing services |
+
+
+
+
 
 ## Implementation
 
