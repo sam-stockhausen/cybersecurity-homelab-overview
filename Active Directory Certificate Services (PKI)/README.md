@@ -11,7 +11,8 @@ Enterprise Root CA (DC01 - Windows Server 2022)
         │
         ├── Grafana (Ubuntu) — HTTPS on port 3000
         ├── Proxmox — HTTPS on port 8006
-        └── [additional services via NPM — in progress]
+        ├── Pihole — HTTPS on port 443
+        └── Pfsense - HTTPS on port 443
 ```
 
 ---
@@ -41,6 +42,17 @@ Enterprise Root CA (DC01 - Windows Server 2022)
 
 ---
 
+## Certificate Workflow (per service)
+ 
+```
+1. Generate CSR on target host (OpenSSL or pfSense UI)
+2. Submit CSR to DC01 Enterprise CA via certreq
+3. Export signed cert from DC01
+4. Transfer cert back to target host
+5. Install cert per service
+6. Install CA root on client machines
+```
+
 ## Key Concepts Demonstrated
 
 - Public Key Infrastructure (PKI) design
@@ -57,6 +69,7 @@ Enterprise Root CA (DC01 - Windows Server 2022)
 - Windows Server defaults to marking private keys as non-exportable — required specific template configuration to allow export for use on Linux
 - Assembling the correct certificate chain (cert + intermediate + root) for services that require a full bundle
 - Modern browsers require SAN fields; CN-only certificates are rejected
+- Proxmox noVNC console has no clipboard support — required HTTP-based file transfer between VMs
 
 ---
 
@@ -66,3 +79,4 @@ Enterprise Root CA (DC01 - Windows Server 2022)
 - OpenSSL — CSR generation and certificate inspection
 - Group Policy — CA trust distribution
 - certreq / MMC Certificates snap-in
+- Python3 http.server / uploadserver — file transfer between VMs
