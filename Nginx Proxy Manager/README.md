@@ -1,6 +1,4 @@
-# Lab 09 — Nginx Proxy Manager
-
-## Overview
+# Overview
 
 Deployed Nginx Proxy Manager (NPM) via Docker on the management VM as a reverse proxy for all internal homelab services. All traffic is routed through NPM using a wildcard SSL certificate issued by the internal Enterprise CA, providing centralized HTTPS termination across VLANs.
 
