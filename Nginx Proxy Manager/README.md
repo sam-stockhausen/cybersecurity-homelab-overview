@@ -23,6 +23,11 @@ All internal hostnames resolve to NPM. NPM terminates TLS with the wildcard cert
 - Deployed NPM as a Docker Compose service with persistent volumes for data and certificates
 - NPM listens on ports 80, 443, and 81 (admin UI)
 
+
+<img width="546" height="56" alt="dockerversion" src="https://github.com/user-attachments/assets/dbc674ac-89df-4158-b2ea-fd55eea466ff" />
+
+  
+
 **DNS Update**
 - Updated Pi-hole local DNS records so all `*.homelab.local` hostnames resolve to the NPM host
 - Previously records pointed directly to each service — rerouting through NPM enables centralized proxy and TLS termination
@@ -34,6 +39,11 @@ All internal hostnames resolve to NPM. NPM terminates TLS with the wildcard cert
 - Generated a CSR, submitted via `certreq` using the `-attrib` flag to specify the template, and accepted the signed cert
 - Exported the certificate chain as a PFX and transferred to the management VM via HTTP file server
 
+
+<img width="918" height="170" alt="wildcard" src="https://github.com/user-attachments/assets/3f113164-5a85-4800-92e8-8b49a003d9ce" />
+
+
+
 **Certificate Conversion**
 - OpenSSL 3.x outputs PKCS#8 format by default — NPM requires legacy RSA format (`BEGIN RSA PRIVATE KEY`)
 - Used the `-legacy` and `-traditional` flags to extract a compatible private key from the PFX
@@ -44,6 +54,18 @@ All internal hostnames resolve to NPM. NPM terminates TLS with the wildcard cert
 - Applied the wildcard cert to all hosts via the SSL tab
 - Proxmox required WebSockets Support enabled for console functionality
 - pfSense and Pi-hole use HTTPS as the forward scheme since they only serve HTTPS on their backends
+
+
+
+<img width="842" height="499" alt="NPM2" src="https://github.com/user-attachments/assets/f6afcf38-2072-408d-a008-41c2a1da64ef" />
+
+
+
+
+<img width="370" height="127" alt="padlock" src="https://github.com/user-attachments/assets/4503503e-1cc5-4dc3-a567-259e2a8b7c76" />
+
+
+
 
 ---
 
