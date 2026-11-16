@@ -13,9 +13,7 @@ A segmented, virtualized environment I use to practice infrastructure, network s
 
 ## Architecture
 
-Network diagram
-
-(<img width="791" height="683" alt="network_diagram" src="https://github.com/user-attachments/assets/96c65cf9-1dc1-4f2d-90bd-a09c57382d5b" />)
+![Network diagram](Images/network_diagram.png)
 
 ### Hardware
 - **Host:** HP EliteDesk 800 G6 SFF (Intel i5-10500, 16 GB RAM, 512 GB NVMe)
