@@ -1,214 +1,91 @@
-# Enterprise Cybersecurity Homelab
+# Cybersecurity Homelab
 
-A production-grade virtualized environment demonstrating enterprise IT and security practices.
+A segmented, virtualized environment I use to practice infrastructure, network security and detection work, and to document what worked, what broke, and what I'd change.
 
----
+## Timeline
 
-## Project Overview
+- **v1 (May 2024):** First build alongside my Penn State internship. Linux fundamentals plus GoPhish phishing, brute-force and Wireshark MITM exercises.
+- **v2 (Jan 2026 – present):** Rebuilt on Proxmox with VLAN segmentation, internal PKI, monitoring, host telemetry and a honeypot alerting pipeline.
 
-Built a complete enterprise homelab from scratch to develop hands-on skills in virtualization, network security, infrastructure automation, and security monitoring. This environment mirrors real-world corporate networks with proper segmentation, certificate management, and monitoring.
-
-**Timeline:** January 2026 – Present  
-**Estimated Hours:** 150+  
-**Status:** Active Development
+**Status:** Active. Estimated hours: 150
 
 ---
 
 ## Architecture
 
+![Network diagram](network_diagram.png)
+
 ### Hardware
-- **Host:** HP EliteDesk 800 G6 SFF
-  - CPU: Intel i5-10500 (6 cores, 12 threads)
-  - RAM: 16GB DDR4
-  - Storage: 512GB NVMe SSD
-- **Network:** TP-Link 5-port unmanaged switch
+- **Host:** HP EliteDesk 800 G6 SFF (Intel i5-10500, 16 GB RAM, 512 GB NVMe)
+- **Switch:** TP-Link 5-port unmanaged
+- **Hypervisor:** Proxmox VE 8.x
 
-### Virtual Machines
+### Virtual machines
 
-| Name         | OS                  | Role                         | Network Segment |
-|--------------|---------------------|------------------------------|-----------------|
-| pfSense      | FreeBSD             | Firewall, Router, VPN        | WAN / All VLANs |
-| Ubuntu-Mgt   | Ubuntu 24.04        | Management, Scripts, Jumpbox | Servers         |
-| DC01         | Windows Server 2022 | Domain Controller, DNS, CA   | Servers         |
-| Win10-Client | Windows 10          | Test Workstation             | Clients         |
-| Monitoring   | Ubuntu 24.04        | Prometheus, Grafana          | Servers         |
-| Pi-hole      | Debian 12           | DNS, Ad-blocking             | Servers         |
+| Name | OS | Role | VLAN |
+|---|---|---|---|
+| pfSense | FreeBSD | Firewall, routing, WireGuard VPN | All |
+| Ubuntu-Mgt | Ubuntu 24.04 | Jumpbox, Nginx Proxy Manager, OpenCanary, Loki/Promtail, scripts | 20 (Servers) |
+| DC01 | Windows Server 2022 | Domain controller, DNS, Enterprise Root CA | 20 (Servers) |
+| Monitoring | Ubuntu 24.04 | Prometheus, Grafana | 20 (Servers) |
+| Pi-hole | Debian 12 | DNS and filtering | 20 (Servers) |
+| Win10-Client | Windows 10 | Test workstation | 30 (Clients) |
 
----
-
-## Implemented Projects
-
-### 1. Network Segmentation & VLAN Design
-**Technologies:** pfSense, VLANs, inter-VLAN routing  
-**Skills:** Network architecture, firewall configuration, security zones
-
-- Designed 4-tier VLAN architecture (Management, Servers, Clients, DMZ)
-- Configured VLAN-aware bridge in Proxmox
-- Implemented inter-VLAN routing with firewall rules
-- Separated production services from client devices
-
-**Key Achievement:** Zero-trust network architecture — each VLAN has explicit access controls with default-deny between segments.
+VLAN 10 (Management) and VLAN 99 (DMZ) are configured but reserved for future hosts.
 
 ---
 
-### 2. Active Directory Certificate Services (PKI)
-**Technologies:** AD CS, OpenSSL, SSL/TLS  
-**Skills:** Public Key Infrastructure, certificate lifecycle management
+## Projects
 
-- Deployed Enterprise Root CA on Windows Server 2022
-- Generated SSL certificates with Subject Alternative Names (SAN)
-- Implemented certificate distribution across Linux and Windows hosts
-- Configured internal services for HTTPS with CA-signed certificates
+### Security and detection
+| Project | What it shows | Write-up |
+|---|---|---|
+| **OpenCanary honeypot pipeline** | Fake SSH/HTTP/RDP/SMB listeners → Promtail → Loki → Grafana alert that fires on internal probes |
+| **Sysmon via Group Policy** | SwiftOnSecurity config deployed to a domain client through a SYSVOL startup script; verified with gpresult and Event Viewer |
+| **Jumpbox (bastion) architecture** | Key-only SSH, firewall rules that block direct SSH to servers, ProxyJump |
 
-**Key Achievement:** Green padlock on all internal services — no browser warnings across the environment.
+### Infrastructure
+| Project | What it shows | Write-up |
+|---|---|---|
+| **VLAN segmentation** | Proxmox VLAN-aware bridge, pfSense VLAN interfaces, default-deny inter-VLAN rules |
+| **Internal PKI (AD CS)** | Enterprise Root CA, SAN certificates, Windows and Linux trust distribution |
+| **Nginx Proxy Manager** | Reverse proxy with a wildcard certificate from the internal CA, DNS routing via Pi-hole |
+| **WireGuard VPN** | Split-tunnel remote access to internal VLANs |
+| **Pi-hole DNS** | Network-wide DNS filtering and local internal records |
+| **Monitoring stack** | Prometheus, exporters and Grafana dashboards for every VM |
 
-**Challenges Overcome:**
-- Windows certificate exportability requirements
-- Cross-platform certificate bundle creation
-- SAN requirements for modern browser compatibility
+### Automation
+- **eyespy.py:** Python and nmap scanner that baselines devices across subnets and flags new ones 
+- **update-vms.sh:** Bash script that patches Linux VMs over SSH and logs the results 
 
----
-
-### 3. Monitoring & Observability Stack
-**Technologies:** Prometheus, Grafana, Node Exporter  
-**Skills:** Metrics collection, dashboard creation, alerting
-
-- Deployed Prometheus for time-series metrics collection
-- Configured exporters for Linux (Node Exporter) and Windows hosts
-- Built custom Grafana dashboards for infrastructure monitoring
-- Integrated DNS service metrics into the monitoring stack
-
-**Metrics Tracked:**
-- CPU, memory, and disk usage across all VMs
-- Network traffic per VLAN
-- DNS query statistics
-- Service uptime
+### v1 exercises (write-ups in progress)
+GoPhish phishing campaign, brute-force password attack, Wireshark MITM and plaintext traffic analysis.
 
 ---
 
-### 4. WireGuard VPN
-**Technologies:** WireGuard, pfSense, NAT  
-**Skills:** VPN configuration, remote access, cryptography
+## Known limitations
 
-- Configured WireGuard server on pfSense
-- Established secure remote access to all internal VLANs
-- Implemented split-tunnel routing
-- Configured port forwarding through ISP gateway
+- Single host with 16 GB RAM, which limits how many VMs run at once.
+- The honeypot's portscan module is disabled because it needs raw socket access that Docker doesn't give it.
+- The Management and DMZ VLANs have no hosts yet.
+- Some certificate and key handling (for example, moving a PFX over a temporary HTTP server) is acceptable in a lab and would not be in production.
 
-**Key Achievement:** Full homelab access from anywhere via encrypted tunnel.
+## Next
 
-**Troubleshooting:** Resolved NAT traversal issues and WAN firewall blocking.
-
----
-
-### 5. Pi-hole Network-Wide Ad Blocking
-**Technologies:** Pi-hole, DNS, DHCP  
-**Skills:** DNS architecture, network filtering
-
-- Deployed Pi-hole as primary DNS resolver
-- Configured DNS forwarding from pfSense
-- Manages 100,000+ blocked domains
-- Integrated with Prometheus for statistics and monitoring
+- Splunk Free with forwarders on the Sysmon hosts
+- Atomic Red Team tests with detections mapped to MITRE ATT&CK
+- Wazuh, once RAM allows
 
 ---
 
-### 6. Python Network Scanner (eyespy.py)
-**Technologies:** Python, nmap, JSON, XML parsing  
-**Skills:** Python development, network discovery, automation
+## Skills practiced
 
-**Features:**
-- Automated network scanning across multiple subnets
-- Device discovery (IP, MAC, hostname, open ports)
-- Baseline comparison for new device detection
-- Alert generation for unauthorized devices
-- Persistent storage with JSON
-
-**Code Highlights:**
-- XML parsing for nmap output
-- Dictionary-based device tracking
-- File I/O for baseline persistence
-- Error handling and logging
-
----
-
-### 7. Automated VM Patching (Bash)
-**Technologies:** Bash, SSH, APT  
-**Skills:** Shell scripting, SSH automation, configuration management
-
-**Features:**
-- Passwordless SSH via key-based authentication
-- Sequential VM updates with error handling
-- Comprehensive logging with timestamps
-- Non-interactive mode for unattended execution
-
-Covers all Linux VMs in the environment.
-
----
-
-### 8. Jumpbox Architecture
-**Technologies:** SSH, bastion host design  
-**Skills:** Privileged access management, defense in depth
-
-- Established secure SSH gateway for all infrastructure access
-- Implemented SSH key-based authentication throughout
-- Restricted direct SSH access to production VMs
-
----
-
-## Skills Demonstrated
-
-**Cloud & Virtualization**
-- Proxmox VE hypervisor management
-- VM lifecycle management and resource optimization
-- Infrastructure as Code principles
-
-**Networking**
-- VLAN design and implementation
-- Firewall rule configuration
-- NAT and port forwarding
-- VPN tunneling (WireGuard)
-- DNS architecture
-
-**Security**
-- PKI and certificate management
-- Zero-trust network segmentation
-- Secure remote access (VPN + jumpbox)
-- Network traffic filtering
-- Threat detection preparation
-
-**Systems Administration**
-- Windows Server (AD, DNS, CA)
-- Linux administration (Ubuntu, Debian)
-- Service management (systemd)
-- User and permission management
-
-**Automation & Scripting**
-- Python (network scanning, automation)
-- Bash (system automation, patching)
-- SSH automation
-- Cron scheduling
-
-**Monitoring & Observability**
-- Prometheus metrics collection
-- Grafana dashboard creation
-- Log aggregation concepts
-- Performance baselining
-
----
+Proxmox, pfSense, VLAN design, Windows Server AD/DNS/Group Policy, AD CS/PKI, WireGuard, SSH hardening, Docker, Prometheus, Grafana, Loki, Sysmon, OpenCanary, Python, Bash
 
 ## Certifications
 
-- CompTIA Security+
-- CompTIA CySA+
-- CompTIA CSAP
-- Microsoft Azure Fundamentals (AZ-900)
-- Certificate of Cloud Security Knowledge (CCSK)
-- Google Cybersecurity Professional Certificate
-- NSA CAE Cyber Defense
-- TryHackMe: SOC Level 1
-
----
+Security+ • CySA+ • CSAP • TryHackMe SOC Level 1 • Google Cybersecurity Professional • AZ-900 • CCSK
 
 ## Connect
 
-LinkedIn: https://www.linkedin.com/in/sam-stockhausen/
+[LinkedIn](https://www.linkedin.com/in/sam-stockhausen/)
