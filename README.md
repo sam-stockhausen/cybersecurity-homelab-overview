@@ -42,19 +42,19 @@ VLAN 10 (Management) and VLAN 99 (DMZ) are configured but reserved for future ho
 ### Security and detection
 | Project | What it shows | Write-up |
 |---|---|---|
-| **OpenCanary honeypot pipeline** | Fake SSH/HTTP/RDP/SMB listeners → Promtail → Loki → Grafana alert that fires on internal probes |
-| **Sysmon via Group Policy** | SwiftOnSecurity config deployed to a domain client through a SYSVOL startup script; verified with gpresult and Event Viewer |
-| **Jumpbox (bastion) architecture** | Key-only SSH, firewall rules that block direct SSH to servers, ProxyJump |
+| **OpenCanary honeypot pipeline** | Fake SSH/HTTP/RDP/SMB listeners → Promtail → Loki → Grafana alert that fires on internal probes | [Write-up](https://github.com/sam-stockhausen/cybersecurity-homelab-overview/blob/main/OpenCanary%20Honeypot/README.md) |
+| **Sysmon via Group Policy** | SwiftOnSecurity config deployed to a domain client through a SYSVOL startup script; verified with gpresult and Event Viewer | [Write-up](https://github.com/sam-stockhausen/cybersecurity-homelab-overview/blob/main/Sysmon%20Deployment%20via%20GPO/README.md)|
+| **Jumpbox (bastion) architecture** | Key-only SSH, firewall rules that block direct SSH to servers, ProxyJump | [Write-up](https://github.com/sam-stockhausen/cybersecurity-homelab-overview/blob/main/Jumpbox/README.md) |
 
 ### Infrastructure
 | Project | What it shows | Write-up |
 |---|---|---|
-| **VLAN segmentation** | Proxmox VLAN-aware bridge, pfSense VLAN interfaces, default-deny inter-VLAN rules |
-| **Internal PKI (AD CS)** | Enterprise Root CA, SAN certificates, Windows and Linux trust distribution |
-| **Nginx Proxy Manager** | Reverse proxy with a wildcard certificate from the internal CA, DNS routing via Pi-hole |
-| **WireGuard VPN** | Split-tunnel remote access to internal VLANs |
-| **Pi-hole DNS** | Network-wide DNS filtering and local internal records |
-| **Monitoring stack** | Prometheus, exporters and Grafana dashboards for every VM |
+| **VLAN segmentation** | Proxmox VLAN-aware bridge, pfSense VLAN interfaces, default-deny inter-VLAN rules | [Write-up](https://github.com/sam-stockhausen/cybersecurity-homelab-overview/blob/main/VLAN%20Network%20Segmentation/README.md) |
+| **Internal PKI (AD CS)** | Enterprise Root CA, SAN certificates, Windows and Linux trust distribution | [Write-up](https://github.com/sam-stockhausen/cybersecurity-homelab-overview/blob/main/Active%20Directory%20Certificate%20Services%20(PKI)/README.md) |
+| **Nginx Proxy Manager** | Reverse proxy with a wildcard certificate from the internal CA, DNS routing via Pi-hole | [Write-up](https://github.com/sam-stockhausen/cybersecurity-homelab-overview/blob/main/Nginx%20Proxy%20Manager/README.md) |
+| **WireGuard VPN** | Split-tunnel remote access to internal VLANs | [Write-up](https://github.com/sam-stockhausen/cybersecurity-homelab-overview/blob/main/WireGuard%20VPN/README.md) |
+| **Pi-hole DNS** | Network-wide DNS filtering and local internal records | [Write-up](https://github.com/sam-stockhausen/cybersecurity-homelab-overview/blob/main/Pi-hole%20Network-Wide%20DNS%20%26%20Ad%20Blocking/README.md) |
+| **Monitoring stack** | Prometheus, exporters and Grafana dashboards for every VM | [Write-up](https://github.com/sam-stockhausen/cybersecurity-homelab-overview/blob/main/Monitoring%20%26%20Observability%20Stack/README.md) |
 
 ### Automation
 - **eyespy.py:** Python and nmap scanner that baselines devices across subnets and flags new ones 
