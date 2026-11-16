@@ -18,7 +18,7 @@ A segmented, virtualized environment I use to practice infrastructure, network s
 ### Hardware
 - **Host:** HP EliteDesk 800 G6 SFF (Intel i5-10500, 16 GB RAM, 512 GB NVMe)
 - **Switch:** TP-Link 5-port unmanaged
-- **Hypervisor:** Proxmox VE 8.x
+- **Hypervisor:** Proxmox VE 9.x
 
 ### Virtual machines
 
